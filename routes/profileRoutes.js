@@ -1,0 +1,11 @@
+import express from "express";
+import { protect } from "../middleware/authMiddleware.js";
+import { createProfile, getProfiles, getProfileById } from "../controllers/profileController.js";
+
+const router = express.Router();
+
+router.post("/createprofile", protect, createProfile); // create new profile
+router.get("/getprofiles", protect, getProfiles);    // get all profiles of logged-in user
+router.get("/getprofile/:id", getProfileById); // get single profile
+
+export default router;

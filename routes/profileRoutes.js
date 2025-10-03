@@ -5,7 +5,7 @@ import { createProfile, getProfiles, getProfileById } from "../controllers/profi
 const router = express.Router();
 
 router.post("/createprofile", protect, createProfile); // create new profile
-router.get("/getprofiles", protect, getProfiles);    // get all profiles of logged-in user
+router.get("/getprofiles/:id", getProfiles);    // get all profiles of logged-in user
 router.get("/getprofile/:id", getProfileById); // get single profile
 
 export default router;

@@ -37,7 +37,7 @@ export const createProfile = async (req, res) => {
 // Get all profiles of logged-in user
 export const getProfiles = async (req, res) => {
   try {
-    const profiles = await Profile.find({ userId: req.user._id });
+    const profiles = await Profile.find({ userId: req.params.id});
     res.status(200).json(profiles);
   } catch (err) {
     console.error("Error fetching profiles:", err.message);

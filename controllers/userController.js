@@ -7,7 +7,7 @@ import User from "../models/User.js";
 export const getUserById = async (req, res) => {
     try {
       const profile = await User.findOne({
-        _id: req.params.id
+        _id: req.params.userId
       });
   
       if (!profile) {

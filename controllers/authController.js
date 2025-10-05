@@ -23,8 +23,12 @@ export const signupUser = async (req, res) => {
     });
 
     return res.status(201).json({
-      _id: newUser._id,
-      email: newUser.email,
+      user:{
+        _id: newUser._id,
+        email: newUser.email,
+        profileIds: user.profileIds
+
+      },
       token: generateToken(newUser._id),
     });
   } catch (error) {

@@ -4,7 +4,7 @@ import generateToken from "../utils/generateToken.js";
 
 export const signupUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
     // check if user exists
     const userExists = await User.findOne({ email });
@@ -20,13 +20,15 @@ export const signupUser = async (req, res) => {
     const newUser = await User.create({
       email,
       password: hashedPassword,
+      fullName: name
     });
 
     return res.status(201).json({
       user:{
         _id: newUser._id,
         email: newUser.email,
-        profileIds: user.profileIds
+        profileIds: newUser.profileIds,
+        name: newUser.fullName
 
       },
       token: generateToken(newUser._id),
@@ -63,7 +65,8 @@ export const signinUser = async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        profileIds: user.profileIds
+        profileIds: user.profileIds,
+        name: user.fullName
       }
     });
   } catch (err) {

@@ -1,17 +1,18 @@
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
 
-// Create Profile
+
 export const createProfile = async (req, res) => {
   try {
     const { profileName, details, resumeUrl } = req.body;
 
-    if (!profileName) {
-      return res.status(400).json({ message: "Profile name is required" });
+    // Basic check for top-level required fields
+    if (!profileName || !details) {
+      return res.status(400).json({ message: "Profile name and details are required" });
     }
 
     const profile = new Profile({
-      userId: req.user._id,
+      userId: req.user._id, // Assumes req.user is populated by auth middleware
       profileName,
       details,
       resumeUrl,
@@ -19,18 +20,31 @@ export const createProfile = async (req, res) => {
 
     const savedProfile = await profile.save();
 
-    // Add profileId reference to user
+    // Add the new profile's ID to the corresponding user document
     await User.findByIdAndUpdate(req.user._id, {
       $push: { profileIds: savedProfile._id },
     });
 
-    res.status(200).json({
-      message: "Profile created successfully",
+    res.status(201).json({ // Use 201 for resource creation
+      message: "Profile created successfully!",
       profile: savedProfile,
     });
+
   } catch (err) {
     console.error("Error creating profile:", err.message);
-    res.status(500).json({ message: "Server error" });
+
+    // ✨ Enhanced Error Handling for Mongoose Validation
+    if (err.name === 'ValidationError') {
+      // Extract validation messages
+      const errors = Object.values(err.errors).map(el => el.message);
+      return res.status(400).json({ 
+        message: "Validation failed. Please check your input.",
+        errors: errors 
+      });
+    }
+
+    // Generic server error for other issues
+    res.status(500).json({ message: "Server error while creating profile." });
   }
 };
 

@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     profileIds: [
       {
         type: mongoose.Schema.Types.ObjectId,

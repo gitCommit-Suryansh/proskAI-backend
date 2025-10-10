@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Unchanged sub-schema
 const addressSchema = new mongoose.Schema(
   {
     street: { type: String, trim: true },
@@ -11,6 +12,18 @@ const addressSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// ✨ NEW: Sub-schema for social and portfolio links
+const socialLinksSchema = new mongoose.Schema(
+  {
+    portfolio: { type: String, trim: true },
+    linkedin: { type: String, trim: true },
+    github: { type: String, trim: true },
+    twitter: { type: String, trim: true },
+  },
+  { _id: false }
+);
+
+// Unchanged sub-schema
 const educationSchema = new mongoose.Schema(
   {
     school: { type: String, required: true },
@@ -23,10 +36,16 @@ const educationSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// 🔄 UPDATED: Experience schema now includes experienceType
 const experienceSchema = new mongoose.Schema(
   {
     company: { type: String, required: true },
     role: { type: String, required: true },
+    experienceType: {
+      type: String,
+      required: true,
+      enum: ["Job", "Internship", "Apprenticeship", "Freelance"],
+    },
     startDate: { type: Date },
     endDate: { type: Date },
     isCurrent: { type: Boolean, default: false },
@@ -35,18 +54,21 @@ const experienceSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// 🔄 UPDATED: Project schema now has separate links for GitHub and Live Demo
 const projectSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     description: { type: String },
     technologies: [String],
-    link: { type: String },
+    githubLink: { type: String, trim: true },
+    liveDemoLink: { type: String, trim: true },
     startDate: { type: Date },
     endDate: { type: Date },
   },
   { _id: false }
 );
 
+// Unchanged sub-schema
 const certificationSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -59,6 +81,7 @@ const certificationSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// --- MAIN PROFILE SCHEMA ---
 const profileSchema = new mongoose.Schema(
   {
     userId: {
@@ -75,30 +98,61 @@ const profileSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // ✨ NEW: Added subscription status
+    subscription: {
+      type: String,
+      enum: ["Free", "Premium"],
+      default: "Free",
+    },
+
+    // --- Main Details Object (Restructured for clarity) ---
     details: {
-      fullName: { type: String, required: true },
-      email: { type: String },
-      phone: { type: String },
-      address: addressSchema,
+      // 🧍 Personal Information
+      personalInfo: {
+        firstName: { type: String, required: true, trim: true },
+        lastName: { type: String, required: true, trim: true },
+        gender: {
+          type: String,
+          enum: ["Male", "Female", "Other", "Prefer not to say"],
+        },
+        nationality: { type: String, trim: true },
+        disability: { type: String, trim: true }, // Flexible for user description
+      },
 
-      skills: [String],
+      // 📞 Contact Information
+      contactInfo: {
+        email: { type: String, required: true },
+        phone: { type: String },
+        presentAddress: addressSchema,
+        socials: socialLinksSchema,
+      },
 
-      experience: [experienceSchema],
+      // 💼 Career Summary
+      careerSummary: {
+        totalExperienceInYears: { type: Number, min: 0 },
+        skills: [String],
+        experience: [experienceSchema],
+        education: [educationSchema],
+        projects: [projectSchema],
+        certifications: [certificationSchema],
+        achievements: [String], // Simple array of strings
+      },
 
-      education: [educationSchema],
-
-      projects: [projectSchema],
-
-      certifications: [certificationSchema],
-
-      // 🔮 Optional: job preferences for autofill optimization
+      // 🎯 Job Preferences
       jobPreferences: {
         jobType: {
           type: String,
-          enum: ["remote", "onsite", "hybrid"],
+          enum: ["Remote", "Onsite", "Hybrid"],
         },
         preferredLocations: [String],
-        expectedSalary: { type: String },
+        currentCTC: { type: String, trim: true }, // String to handle currency/lakhs etc.
+        expectedCTC: { type: String, trim: true },
+        willingToRelocate: { type: Boolean, default: false },
+        visaRequired: { type: Boolean, default: false },
+        noticePeriod: {
+          available: { type: Boolean, default: false },
+          durationInDays: { type: Number },
+        },
       },
     },
   },

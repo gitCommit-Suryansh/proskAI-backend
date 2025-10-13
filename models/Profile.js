@@ -11,7 +11,6 @@ const addressSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// 🔄 UPDATED: Added 'other' for miscellaneous links
 const socialLinksSchema = new mongoose.Schema(
   {
     portfolio: { type: String, trim: true },
@@ -23,20 +22,17 @@ const socialLinksSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// Unchanged sub-schema
+// 🔄 UPDATED: startDate and endDate removed
 const educationSchema = new mongoose.Schema(
   {
     school: { type: String, required: true },
     degree: { type: String },
     fieldOfStudy: { type: String },
-    startDate: { type: Date },
-    endDate: { type: Date },
     grade: { type: String },
   },
   { _id: false }
 );
 
-// 🔄 UPDATED: Experience schema now includes experienceType
 const experienceSchema = new mongoose.Schema(
   {
     company: { type: String, required: true },
@@ -54,6 +50,7 @@ const experienceSchema = new mongoose.Schema(
   { _id: false }
 );
 
+// 🔄 UPDATED: startDate and endDate removed
 const projectSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -61,13 +58,10 @@ const projectSchema = new mongoose.Schema(
     technologies: [String],
     githubLink: { type: String, trim: true },
     liveDemoLink: { type: String, trim: true },
-    startDate: { type: Date },
-    endDate: { type: Date },
   },
   { _id: false }
 );
 
-// Unchanged sub-schema
 const certificationSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -91,7 +85,6 @@ const languageSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// ✨ NEW: Publication Sub-Schema
 const publicationSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -101,7 +94,7 @@ const publicationSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// --- MAIN PROFILE SCHEMA ---
+// --- MAIN PROFILE SCHEMA (No changes needed here) ---
 const profileSchema = new mongoose.Schema(
   {
     userId: {
@@ -116,16 +109,11 @@ const profileSchema = new mongoose.Schema(
       enum: ["Free", "Premium"],
       default: "Free",
     },
-
-    // --- Main Details Object ---
     details: {
-      // 🧍 Personal Information
       personalInfo: {
         firstName: { type: String, required: true, trim: true },
         lastName: { type: String, required: true, trim: true },
-        pronouns: { type: String, trim: true }, // e.g., he/him
-
-        // ✨ NEW: Demographic information (often optional for legal reasons)
+        pronouns: { type: String, trim: true },
         demographics: {
           gender: { type: String, enum: ["Male", "Female", "Non-binary", "Other", "Prefer not to say"] },
           ethnicity: { type: String, trim: true },
@@ -134,8 +122,6 @@ const profileSchema = new mongoose.Schema(
           veteranStatus: { type: String, enum: ["Yes", "No", "Prefer not to say"] },
         },
       },
-
-      // 📞 Contact Information
       contactInfo: {
         email: { type: String, required: true },
         phoneCountryCode: { type: String, trim: true, default: "+91" },
@@ -143,16 +129,12 @@ const profileSchema = new mongoose.Schema(
         presentAddress: addressSchema,
         socials: socialLinksSchema,
       },
-
-      // ✨ NEW: Work Authorization Details
       workAuthorization: {
         nationality: { type: String, trim: true },
         usAuthorized: { type: Boolean },
         sponsorshipRequired: { type: Boolean },
         citizenshipStatus: { type: String, trim: true },
       },
-
-      // 💼 Career Summary
       careerSummary: {
         totalExperienceInYears: { type: Number, min: 0 },
         skills: [String],
@@ -164,8 +146,6 @@ const profileSchema = new mongoose.Schema(
         languages: [languageSchema],
         publications: [publicationSchema],
       },
-
-      // 🎯 Job Preferences
       jobPreferences: {
         jobType: { type: String, enum: ["Remote", "Onsite", "Hybrid"] },
         preferredLocations: [String],

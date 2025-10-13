@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-// Unchanged sub-schema
 const addressSchema = new mongoose.Schema(
   {
     street: { type: String, trim: true },
@@ -12,13 +11,14 @@ const addressSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// ✨ NEW: Sub-schema for social and portfolio links
+// 🔄 UPDATED: Added 'other' for miscellaneous links
 const socialLinksSchema = new mongoose.Schema(
   {
     portfolio: { type: String, trim: true },
     linkedin: { type: String, trim: true },
     github: { type: String, trim: true },
     twitter: { type: String, trim: true },
+    other: { type: String, trim: true },
   },
   { _id: false }
 );
@@ -54,7 +54,6 @@ const experienceSchema = new mongoose.Schema(
   { _id: false }
 );
 
-// 🔄 UPDATED: Project schema now has separate links for GitHub and Live Demo
 const projectSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -81,6 +80,27 @@ const certificationSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const languageSchema = new mongoose.Schema(
+  {
+    language: { type: String, required: true },
+    proficiency: {
+      type: String,
+      enum: ["Basic", "Conversational", "Fluent", "Native"],
+    },
+  },
+  { _id: false }
+);
+
+// ✨ NEW: Publication Sub-Schema
+const publicationSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    link: { type: String, trim: true },
+    description: { type: String, trim: true },
+  },
+  { _id: false }
+);
+
 // --- MAIN PROFILE SCHEMA ---
 const profileSchema = new mongoose.Schema(
   {
@@ -89,42 +109,47 @@ const profileSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    profileName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    resumeUrl: {
-      type: String,
-      trim: true,
-    },
-    // ✨ NEW: Added subscription status
+    profileName: { type: String, required: true, trim: true },
+    resumeUrl: { type: String, trim: true },
     subscription: {
       type: String,
       enum: ["Free", "Premium"],
       default: "Free",
     },
 
-    // --- Main Details Object (Restructured for clarity) ---
+    // --- Main Details Object ---
     details: {
       // 🧍 Personal Information
       personalInfo: {
         firstName: { type: String, required: true, trim: true },
         lastName: { type: String, required: true, trim: true },
-        gender: {
-          type: String,
-          enum: ["Male", "Female", "Other", "Prefer not to say"],
+        pronouns: { type: String, trim: true }, // e.g., he/him
+
+        // ✨ NEW: Demographic information (often optional for legal reasons)
+        demographics: {
+          gender: { type: String, enum: ["Male", "Female", "Non-binary", "Other", "Prefer not to say"] },
+          ethnicity: { type: String, trim: true },
+          race: { type: String, trim: true },
+          disabilityStatus: { type: String, enum: ["Yes", "No", "Prefer not to say"] },
+          veteranStatus: { type: String, enum: ["Yes", "No", "Prefer not to say"] },
         },
-        nationality: { type: String, trim: true },
-        disability: { type: String, trim: true }, // Flexible for user description
       },
 
       // 📞 Contact Information
       contactInfo: {
         email: { type: String, required: true },
+        phoneCountryCode: { type: String, trim: true, default: "+91" },
         phone: { type: String },
         presentAddress: addressSchema,
         socials: socialLinksSchema,
+      },
+
+      // ✨ NEW: Work Authorization Details
+      workAuthorization: {
+        nationality: { type: String, trim: true },
+        usAuthorized: { type: Boolean },
+        sponsorshipRequired: { type: Boolean },
+        citizenshipStatus: { type: String, trim: true },
       },
 
       // 💼 Career Summary
@@ -135,20 +160,18 @@ const profileSchema = new mongoose.Schema(
         education: [educationSchema],
         projects: [projectSchema],
         certifications: [certificationSchema],
-        achievements: [String], // Simple array of strings
+        achievements: [String],
+        languages: [languageSchema],
+        publications: [publicationSchema],
       },
 
       // 🎯 Job Preferences
       jobPreferences: {
-        jobType: {
-          type: String,
-          enum: ["Remote", "Onsite", "Hybrid"],
-        },
+        jobType: { type: String, enum: ["Remote", "Onsite", "Hybrid"] },
         preferredLocations: [String],
-        currentCTC: { type: String, trim: true }, // String to handle currency/lakhs etc.
+        currentCTC: { type: String, trim: true },
         expectedCTC: { type: String, trim: true },
         willingToRelocate: { type: Boolean, default: false },
-        visaRequired: { type: Boolean, default: false },
         noticePeriod: {
           available: { type: Boolean, default: false },
           durationInDays: { type: Number },
@@ -159,7 +182,6 @@ const profileSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Index for faster querying by user
 profileSchema.index({ userId: 1 });
 
 export default mongoose.model("Profile", profileSchema);

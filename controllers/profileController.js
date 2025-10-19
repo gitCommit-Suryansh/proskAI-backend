@@ -1,7 +1,5 @@
 import Profile from "../models/Profile.js";
 import User from "../models/User.js";
-import DemoProfile from "../models/Test.js";
-
 
 
 export const createProfile = async (req, res) => {
@@ -90,6 +88,36 @@ export const deleteProfile = async (req, res) => {
   }
 };
 
+export const updateProfile = async (req, res) => {
+  try {
+    const { profileId } = req.params;
+    const userId = req.user._id;
+
+    const updatedProfile = await Profile.findOneAndUpdate(
+      { _id: profileId, userId: userId }, 
+      req.body, 
+      { new: true, runValidators: true } 
+    );
+
+    if (!updatedProfile) {
+      return res.status(404).json({ message: "Profile not found or you are not authorized to update it." });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully!",
+      profile: updatedProfile,
+    });
+
+  } catch (err) {
+    console.error("Error updating profile:", err.message);
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(el => el.message);
+      return res.status(400).json({ message: "Validation failed.", errors });
+    }
+    res.status(500).json({ message: "Server error while updating profile." });
+  }
+};
+
 
 // Get all profiles of logged-in user
 export const getProfiles = async (req, res) => {
@@ -105,17 +133,13 @@ export const getProfiles = async (req, res) => {
 // Get single profile by ID (only if it belongs to logged-in user)
 export const getProfileById = async (req, res) => {
   try {
-    const profile = await Profile.findOne({
-      _id: req.params.profileId
-    });
-
+    const {profileId}=req.params;
+    const profile = await Profile.findOne({ _id: profileId, userId: req.user._id });
     if (!profile) {
-      return res.status(404).json({ message: "Profile not found" });
+      return res.status(404).json({ message: "Profile not found." });
     }
-
     res.status(200).json(profile);
   } catch (err) {
-    console.error("Error fetching profile by ID:", err.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error." });
   }
 };

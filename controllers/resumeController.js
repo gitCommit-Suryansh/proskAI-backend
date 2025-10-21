@@ -1,33 +1,41 @@
-import axios from "axios";
-import fs from "fs";
+import cloudinary from '../config/cloudinary.js'; // ✅ FIXED: Correct path to your config
+import streamifier from 'streamifier';
 
-export const parseResume = async (req, res) => {
+export const uploadResume = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
+
   try {
-    
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-    console.log(req.file?"file uploaded":"file not uploaded")
+    const uploadStream = (buffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "RESUMES",
+            public_id: `resume_${req.user._id}_${Date.now()}`,
+            resource_type: "auto"
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+        streamifier.createReadStream(buffer).pipe(stream);
+      });
+    };
 
-    const fileData = fs.readFileSync(req.file.path);
+    const result = await uploadStream(req.file.buffer);
 
-    const response = await axios.post(
-      "https://api.affinda.com/v3/resumes",
-      fileData,
-      {
-        headers: {
-          "Authorization": `Bearer ${process.env.AFFINDA_API_KEY}`,
-          "Content-Type": "application/octet-stream"
-        }
-      }
-    );
+    res.status(200).json({
+      message: "Resume uploaded successfully!",
+      resumeUrl: result.secure_url,
+    });
 
-    // delete uploaded file after parsing
-    fs.unlinkSync(req.file.path);
-
-    return res.json(response.data);
   } catch (err) {
-    console.error("Affinda error:", err.message);
-    return res.status(500).json({ message: "Error parsing resume" });
+    console.error("Cloudinary upload failed:", err.message);
+    res.status(500).json({ message: "File upload failed." });
   }
 };

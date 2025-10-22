@@ -2,7 +2,8 @@ import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
 import upload from '../middleware/multer.js';
 import { createProfile, getProfiles, getProfileById,deleteProfile,updateProfile} from "../controllers/profileController.js";
-import {uploadResume} from '../controllers/resumeController.js'
+import {uploadResume, parseResume} from '../controllers/resumeController.js'
+
 
 const router = express.Router();
 
@@ -14,5 +15,7 @@ router.get("/getprofiles/:userId", getProfiles);    // get all profiles of logge
 router.get("/getprofile/:profileId", protect , getProfileById); // get single profile
 router.put("/updateprofile/:profileId", protect, updateProfile);
 router.post("/upload-resume", protect, upload.single('resume'), uploadResume);
+
+router.post("/parse-resume", protect, upload.single('resume'), parseResume);
 
 export default router;

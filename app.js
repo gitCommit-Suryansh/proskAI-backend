@@ -5,6 +5,8 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import userRoutes from './routes/userRoutes.js'
+import keywordRoutes from "./routes/keywordRoutes.js";
+import matchRoutes   from './routes/MatchRoutes.js'
 
 
 dotenv.config();
@@ -18,6 +20,8 @@ app.use(cors()); // Use cors middleware
 app.use("/api/auth", authRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use('/api/user',userRoutes)
+app.use("/api/keywords", keywordRoutes);
+app.use("/api/match",matchRoutes);
 
 
 export default app;

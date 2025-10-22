@@ -3,6 +3,8 @@ import express from "express";
 import Keyword from "../models/Keyword.js";
 import Profile from "../models/Profile.js";
 import { buildKeywords } from "../services/keywordBuilder.js";
+import { addDemoKeywords } from "../controllers/KeywordController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -29,5 +31,7 @@ router.get("/rebuild/:profileId", async (req,res)=>{
     res.status(400).json({ ok:false, error: e.message });
   }
 });
+
+router.post("/add-demo-keywords", protect, addDemoKeywords);
 
 export default router;

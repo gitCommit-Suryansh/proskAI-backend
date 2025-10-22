@@ -5,7 +5,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import userRoutes from './routes/userRoutes.js'
-import keywordRoutes from "./routes/keywordRoutes.js";
+import keywordRoutes from "./routes/KeywordRoutes.js";
 import matchRoutes   from './routes/MatchRoutes.js'
 
 

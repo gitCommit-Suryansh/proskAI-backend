@@ -41,3 +41,36 @@ export const addDemoKeywords = async (req, res) => {
       res.status(500).json({ message: "Server error." });
     }
   };
+
+  // POST /api/keywords/upsert
+  export const upsertKeywords = async (req, res) => {
+    try {
+      const { userId, profileId, keywords } = req.body || {};
+      if (!userId || !profileId || !Array.isArray(keywords)) {
+        return res.status(400).json({ ok:false, message:"userId, profileId and keywords[] required" });
+      }
+  
+      const doc = await Keyword.findOneAndUpdate(
+        { userId, profileId },
+        { $set: { keywords } },
+        { upsert:true, new:true, setDefaultsOnInsert:true }
+      );
+      return res.json({ ok:true, keyword: doc });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ ok:false, message:"Upsert failed" });
+    }
+  };
+  
+  // GET /api/keywords/:userId/:profileId
+  export const getKeywords = async (req, res) => {
+    try {
+      const { userId, profileId } = req.params;
+      const doc = await Keyword.findOne({ userId, profileId });
+      if (!doc) return res.status(404).json({ ok:false, message:"Not found" });
+      res.json({ ok:true, keyword: doc });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ ok:false, message:"Error" });
+    }
+  };

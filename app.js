@@ -6,7 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import userRoutes from './routes/userRoutes.js'
 import keywordRoutes from "./routes/KeywordRoutes.js";
-import matchRoutes   from './routes/MatchRoutes.js'
+import scoreRoutes from "./routes/scoreRoutes.js";
 
 
 dotenv.config();
@@ -21,7 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use('/api/user',userRoutes)
 app.use("/api/keywords", keywordRoutes);
-app.use("/api/match",matchRoutes);
+app.use("/api/score", scoreRoutes);
 
 
 export default app;
